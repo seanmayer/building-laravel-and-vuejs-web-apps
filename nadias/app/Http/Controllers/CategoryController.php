@@ -14,11 +14,28 @@ class CategoryController extends Controller
      */
     public function index()
     {
+        $this->authorize('manage', 'App\Category');
         $categories = Category::orderBy('display_order')->get();
         return view('admin.categories.index', [
             'categories' => $categories
             ]);
     }
+
+    public function upsert(Request $request)
+    {
+        $this->authorize('manage', 'App\Category');
+        $categories = $request->post('categories');
+        foreach ($categories as $cat) {
+            if($cat['id']) {
+                Category::where('id', $cat['id'])->update($cat);
+            }
+            else {
+                Category::create($cat);
+            }
+        }
+        return ['success' => true, 'categories' => Category::all()];
+    }
+
 
     /**
      * Show the form for creating a new resource.
@@ -83,6 +100,8 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-        //
+        $this->authorize('delete', $category);
+        $category->delete();
+        return ['success' => true];
     }
 }

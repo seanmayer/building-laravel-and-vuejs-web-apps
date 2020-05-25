@@ -1923,18 +1923,56 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['initialCategories'],
   data: function data() {
     return {
-      categories: _.cloneDeep(this.initialCategories)
+      categories: this.initialCategories,
+      feedback: ''
     };
   },
   methods: {
     removeCategory: function removeCategory(index) {
       if (confirm('Are you sure?')) {
+        var id = this.categories[index].id;
+
+        if (id > 0) {
+          axios["delete"]('/api/categories/' + id);
+        }
+
         this.categories.splice(index, 1);
       }
+    },
+    addCategory: function addCategory() {
+      var _this = this;
+
+      this.categories.push({
+        id: 0,
+        name: '',
+        image: '',
+        display_order: this.categories.length + 1
+      });
+      this.$nextTick(function () {
+        window.scrollTo(0, document.body.scrollHeight);
+
+        _this.$refs[''][0].focus();
+      });
+    },
+    saveCategories: function saveCategories() {
+      var _this2 = this;
+
+      axios.post('/api/categories/upsert', {
+        categories: this.categories
+      }).then(function (res) {
+        if (res.data.success) {
+          _this2.feedback = 'Changes saved.';
+          _this2.categories = res.data.categories;
+        }
+      });
     }
   }
 });
@@ -38131,7 +38169,19 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c(
     "form",
+    {
+      on: {
+        submit: function($event) {
+          $event.preventDefault()
+          return _vm.saveCategories($event)
+        }
+      }
+    },
     [
+      _c("a", { staticClass: "add", on: { click: _vm.addCategory } }, [
+        _vm._v("+ Add Category")
+      ]),
+      _vm._v(" "),
       _vm._l(_vm.categories, function(category, index) {
         return _c("div", { key: category.id }, [
           _c("input", {
@@ -38143,6 +38193,8 @@ var render = function() {
                 expression: "category.name"
               }
             ],
+            ref: category.name,
+            refInFor: true,
             attrs: { type: "text" },
             domProps: { value: category.name },
             on: {
@@ -38190,27 +38242,27 @@ var render = function() {
           ),
           _vm._v(" "),
           _c("div", [
-            _c("img", {
-              attrs: { src: "/images/" + category.image, width: "100" }
-            }),
+            category.image
+              ? _c("img", {
+                  attrs: { src: "/images/" + category.image, width: "100" }
+                })
+              : _c("label", [_vm._v("Image: ")]),
             _vm._v(" "),
             _c("input", {
               directives: [
                 {
                   name: "model",
-                  rawName: "v-model",
+                  rawName: "v-model.lazy",
                   value: category.image,
-                  expression: "category.image"
+                  expression: "category.image",
+                  modifiers: { lazy: true }
                 }
               ],
               attrs: { type: "text" },
               domProps: { value: category.image },
               on: {
-                input: function($event) {
-                  if ($event.target.composing) {
-                    return
-                  }
-                  _vm.$set(category, "image", $event.target.value)
+                change: function($event) {
+                  return _vm.$set(category, "image", $event.target.value)
                 }
               }
             })
@@ -38218,7 +38270,11 @@ var render = function() {
         ])
       }),
       _vm._v(" "),
-      _c("hr")
+      _c("hr"),
+      _vm._v(" "),
+      _c("button", { attrs: { type: "submit" } }, [_vm._v("Save")]),
+      _vm._v(" "),
+      _c("div", [_vm._v(" " + _vm._s(_vm.feedback) + " ")])
     ],
     2
   )
