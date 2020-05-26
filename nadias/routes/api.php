@@ -17,3 +17,5 @@ use Illuminate\Support\Facades\Route;
 Route::post('/categories/upsert', 'CategoryController@upsert');
 
 Route::delete('/categories/{category}', 'CategoryController@destroy');
+
+Route::post('/menu-items/add', 'MenuItemController@store');
