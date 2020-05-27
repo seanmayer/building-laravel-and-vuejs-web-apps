@@ -59,14 +59,16 @@ class CategoryController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Display the item in category resource.
      *
      * @param  \App\Category  $category
      * @return \Illuminate\Http\Response
      */
-    public function show(Category $category)
+    public function items(Category $category)
     {
-        //
+        return $category->menuItems->map(function ($item) {
+            return $item->only(['id','name']);
+        });
     }
 
     /**
