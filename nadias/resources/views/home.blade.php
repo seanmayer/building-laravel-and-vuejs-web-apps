@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title',' - Creating memories, one experience at a time')
+@section('title', ' - Creating memories, one experience at a time')
 
 @section('content')
 <h4 class="intro">Creating memories, one experience at a time</h4>               
@@ -15,9 +15,8 @@
         <article>
             <a href="/menu#{{str_slug($cat->name)}}"><img src="/images/{{$cat->image}}"></a>
             <h2><a href="/menu#{{str_slug($cat->name)}}">{{$cat->name}}</a></h2>
-        </article>
-    @endforeach                
-             
+        </article>   
+    @endforeach                                
 </div>
 <div class="social">
     <div>
@@ -38,5 +37,5 @@
         <a href="#"><img src="/images/fb.png"></a>
         <a href="#"><img src="/images/ig.png"></a>    
     </div>
-</div>    
+</div>
 @endsection
